@@ -1,0 +1,26 @@
+{
+  "name": "volv_notifications",
+  "version": "1.0.0",
+  "description": "Volv Notifications is a project which serves the purpose of sending notifications to VOLV mobile app users of Android and iOS both types. During the process of sending notification it creates a campaign on CleverTap TEST Project and LIVE Project and then send notification & finally also sends notification to legacy users.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Volv",
+    "Notifications",
+    "CleverTap"
+  ],
+  "author": "Dipak Rathod",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "firebase-admin": "^11.10.1",
+    "http": "0.0.1-security",
+    "mysql": "^2.18.1",
+    "promise": "^8.3.0",
+    "request": "^2.88.2"
+  }
+}

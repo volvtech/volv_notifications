@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png"
+        href="https://avatars3.githubusercontent.com/u/56148781?s=400&u=e43e9af6b3cde53c0aad1720ba7054e54924f3fe&v=4">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script defer src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.11.0/sweetalert2.css" />
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.11.0/sweetalert2.all.min.js"></script>
+    <title>Volv | View Article</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
+
+</head>
+
+<style type="text/css">
+    .main_section {
+        font-family: 'Roboto', sans-serif !important;
+        font-size: 14px;
+    }
+
+    .article_table {
+        position: fixed;
+        top: 0;
+        left: 0;
+        overflow: auto;
+        overflow-y: scroll;
+
+    }
+
+    #loading-icon {
+        display: none;
+    }
+</style>
+
+<body>
+    <%- include('layouts/header') %>
+
+    <div class="container-fluid main_section"><br>
+        <div class="row">
+            <h3><b><u>Published Articles on Volv App:</u></b></h3>
+            <a class="btn btn-primary pull-right" style="position: absolute; right: 0;"
+                href="/notification_report/">Notification Report</a><br>
+        </div>
+        <table id="article_table" class="table table-striped dataTable dashbopard_panel">
+            <thead>
+                <th>Article Image</th>
+                <th>Category</th>
+                <th style="width: 40%;"><i class="fa fa-newspaper-o" aria-hidden="true"></i>&nbsp;Articles</th>
+                <th><i class="fa fa-user"></i>&nbsp;Author</th>
+                <th><i class="fa fa-clock-o"></i>&nbsp;Last Updated</th>
+                <th>Notification Text</th>
+                <th>Sequence</th>
+                <th style="width: 10%;height:fit-content">Status</th>
+                <th>Action</th>
+                <th>Activity</th>
+            </thead>
+
+            <tbody id='myTable'>
+                <input type="hidden" name="" id="start_point" value="15">
+                <% articles.forEach(function(check){ %>
+                <tr>
+                    <td><img src="<%= check.article_image %>" height="100px" width="100px"></td>
+                    <td class="art"><%= check.article_category %></td>
+                    <td class="art" style="width: 40%;">
+                        <p class="text-center bold"><b><%=  check.article_heading %></b></p><%= check.article_summary %>
+                    </td>
+                    <td class="art"><%= check.article_author %></td>
+                    <td class="art "><%= check.updated_at %></td>
+                    <% if(check.notification_text){ %>
+                    <td class="art notification-text"><%= check.notification_text %></td>
+                    <% } 
+                            else{ %>
+                    <td>N.A.</td>
+                    <% } %>
+                    <td class="art">
+                        <input type="checkbox" class="notification_sequence form-control" value="<%=check.id%>"
+                            name="notification_sequence">
+                        <br>
+                        <select class="notif_sequence form-control">
+                            <option value="0">Choose</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                    </td>
+                    <td class="art">
+                        <input type="hidden" value="<%=check.id%>" name="article_status_id">
+
+                        <select class="article_status form-control" name="article_status">
+                            <option value="Published" <% if(check.article_status=='Published'){ %> selected <% } %>>
+                                Published</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Needs Review">Needs Review</option>
+                            <option value="Rejected">Rejected</option>
+                            <option value="Rollback">Rollback</option>
+                            <option value="Weekend">Weekend</option>
+                            <option value="Edited">Edited</option>
+                            <option value="Republished" <% if(check.article_status=='Republished') { %> selected
+                                <% } else { %> <% } %>>Republished</option>
+                        </select>
+                    </td>
+                    <td class="art">
+                        <a class="article_delete"><span class="btn btn-danger"><i class="fa fa-trash"
+                                    title="Delete Sales"></i></span>
+                            <input type="hidden" value="<%=check.id%>">
+                        </a>
+                        <a href="https://dashboard.volvmedia.com/edit_articles/<%=check.id%>"><button type="button"
+                                class="btn btn-info"><i class="fa fa-edit"></i></button></a>
+                        <a href="https://dashboard.volvmedia.com/view_articles/<%=check.id%>"><button type="button"
+                                class="btn btn-success"><i class="fa fa-eye"></i></button></a>
+                    </td>
+                    <input type="hidden" class="status" value="<%=[check.notification_sent_status]%>">
+                    <% if(check.notification_text){ %>
+                    <td><a href=""><button class="btn btn-info pqr" value="<%= [check.id] %>"
+                                name="notify_btn">Notify</button></a></td>
+                    <% } 
+                    else{ %>
+                    <td>N.A.</td>
+                    <% } %>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+    <div class="ajax-load text-center" id='loading-icon' style="display: none;">
+        <p><img src="/assets/imgs/loading_icon.gif" height="100">Loading articles...</p>
+    </div>
+</body>
+
+<script>
+    $(window).scroll(function () {
+        if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
+            var data = $('#start_point').val();
+            //console.log($('#start_point').val());
+            $.ajax({
+                type: "GET",
+                url: '/scroll_articles/' + data,
+                beforeSend: function () {
+                    $('#loading-icon').show();
+                },
+                complete: function () {
+                    $('#loading-icon').hide();
+
+                },
+                success: function (obj) {
+                    if (obj) {
+                        $('#start_point').val(parseInt(data) + 15);
+                        $('tbody').append(obj);
+                    } else {
+                        $('.ajax-load').html(
+                            "<div class='alert alert-danger'><b>No more articles found</b></div>"
+                            );
+                    }
+
+                },
+                error: function (obj) {
+                    alert('Server Not Responding.........')
+                    alert("Error");
+                }
+            });
+
+        }
+    });
+</script>
+
+<script type="text/javascript">
+    //////////////////Article Delete Logic/////////////////
+    $('body').on('click', "a[class=article_delete]", function (e) {
+        e.preventDefault();
+        var id = $(this).children('input').val();
+        var remove_ele = $(this).closest('tr')
+        swal({
+            title: "Do you want to proceed?",
+            text: "You Article will get deleted!",
+            type: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Confirm!',
+        }).then((e) => {
+            if (e['value']) {
+                $.ajax({
+                    type: "GET",
+                    url: '/delete_article/' + id,
+                    success: function (obj) {
+                        //$('body').hide().fadeIn(2000).load('#article_table tbody')
+                        $('body').hide().fadeIn(2000);
+                        remove_ele.remove();
+                        //swal({
+                        //  title: 'Done',
+                        //    type: 'success',
+                        // });
+
+                    },
+                    error: function (obj) {
+                        console.log("error")
+                    },
+
+                });
+            }
+        }).catch(function (reason) {
+            alert("The alert was dismissed by the user: " + reason);
+        });
+
+    });
+
+    ////////////////Article Update Logic/////////////////////
+    $('body').on('change', 'select[name=article_status]', function (e) {
+        e.preventDefault();
+        let article_status = $(this).val();
+        let id = $(this).siblings('input[name=article_status_id]').val();
+        var element = $(this).closest('tr');
+
+        $.ajax({
+            type: "POST",
+            url: `/update_article/${id}`,
+            data: {
+                data: JSON.stringify(article_status),
+            },
+            success: function (obj) {
+                //  console.log(obj)
+                if (JSON.parse(obj) == "success") {
+                    //$('body').hide().fadeIn(2000).load('#article_table'); 
+                    if (article_status == "Published" || article_status == "Republished") {
+                        $('body').hide().fadeIn(2000);
+                        $("#myTable").prepend(element);
+
+                    } else {
+                        $('body').hide().fadeIn(2000);
+                        element.remove();
+                    }
+                    //console.log(scroll_pos['top'])
+
+                } else {
+                    alert("Update of article status Unsuccesful!!");
+                }
+
+            },
+            error: function (obj) {
+                console.log("error")
+            },
+        });
+    });
+    var checkbox = {}
+
+    $(".notification_sequence").on('click', function (e) {
+        if ($(this).is(':checked')) {
+            checkbox[e.target.value] = e.target;
+        } else {
+            delete checkbox[e.target.value];
+        }
+    });
+
+    //Notification Send Logic
+    $('body').on('click', "button[name=notify_btn]", function (e) {
+        e.preventDefault();
+        var data = $(this).val();
+
+        console.log("Notification data**", data)    
+
+        if ($(this).closest("tr").find(".status").val() == '0') {
+            swal({
+                title: "Do you want to proceed?",
+                //text: "You Article will get published!",
+                type: 'success',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Confirm!',
+                //closeOnConfirm: false,
+                //closeOnCancel: false
+            }).then((e) => {
+                if (e['value']) {
+                    var notificationPreference = {};
+                    for (i in checkbox) {
+                        notificationPreference[$(checkbox[i]).next().next().val()] = $(checkbox[i])
+                        .val();
+                    }
+                                        
+                    let payloadObj = {}
+                    payloadObj["article_ids"] = notificationPreference
+                    payloadObj["campaign_name"] = "Trending Notification 220720231637";
+                    payloadObj["articleId"] = 0;
+                    payloadObj["title"] = "Test Article Title";
+                    payloadObj["deepLink"] = "www.example.com";
+                    payloadObj["categories"] = ["Sports", "Politics"];
+                    payloadObj["notificationTitle"] = "Test Notification title";
+                    payloadObj["notificationBody"] = "Test Notification Body";
+                    payloadObj["categories"] = ["Sports", "Politics"];
+                   
+                    console.log("payloadObj***", payloadObj);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/pushnotication/',
+                        cache: false,
+                        data: {
+                            data: JSON.stringify(payloadObj),
+                        },
+                        success: function (obj) {
+                            //    console.log("reposonse", obj);
+                           //$('#myTable').html(obj);
+                            if (JSON.parse(obj) != "error") {
+                                swal({
+                                    title: JSON.parse(obj),
+                                    type: 'success',
+                                }).then((res) => {
+                                    // $('body').fadeIn(2000).load('#article_table');
+                                    location.reload();
+                                    $(this).closest("tr").find(".status").val('1');
+
+                                }).catch((err)=>{
+                                    console.log(err);
+                                });
+                            } else {
+                                alert('Error storing the notification response');
+                            }
+
+                        },
+                        error: function (obj) {
+                            alert('Error Sending the notification');
+                            console.log("error", obj);
+                        },
+                    });
+                }
+            }).catch(function (reason) {
+                alert("The alert was dismissed by the user: " + reason);
+            });
+        } else {
+            swal({
+                title: "Already sent notification!",
+                type: 'info',
+            })
+        }
+
+    });
+</script>
+
+</body>
+
+</html>

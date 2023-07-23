@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://avatars3.githubusercontent.com/u/56148781?s=400&u=e43e9af6b3cde53c0aad1720ba7054e54924f3fe&v=4">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script defer src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <title>Volv | Notification Report</title>
+    <style>
+        .main_section {
+            font-family: 'Roboto', sans-serif !important;
+            font-size: 14px;
+        }
+
+        .table {
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('layouts/header') %>
+
+    <div class="container-fluid main_section"><br>
+        <div class="row">
+            <h3><i class="fa fa-bell"></i>&nbsp;<u>Notification Report:</u></h3>
+            <a class="btn btn-primary" style="position: absolute; right: 0;margin-right:15px;" href="/">View Articles</a>
+        </div>
+        <table class="table table-bordered table-striped table-hover">
+            <thead>
+                <th>Sr No</th>
+                <th>Article Image</th>
+                <th>Notification Text</th>
+                <th>Success Count</th>
+                <th>Failure Count</th>
+                <th>Invalid Registration</th>
+                <th>Not Registered</th>
+                <th>Date</th>
+                <th>View Reports</th>
+            </thead>
+            <tbody>
+                <% notification_report.forEach(function(element,i){ %>
+                <tr>
+                    <td><%= i+1 %></td>
+                    <td><img src="<%= element['article_image'] %>" height="100px" width="100px" alt="Image Not Loaded...!!!"></td>
+                    <td><%= element['article_title'] %></td>
+                    <td><%= element['success_count'] %></td>
+                    <td><%= element['failure_count'] %></td>
+                    <td><%= element['invalid_registration'] %></td>
+                    <td><%= element['not_registered'] %></td>
+                    <td><%= element['notification_date'] %></td>
+                    <td><a href="/notification_report/stats/<%=element['article_id']%>/<%=element['_id']%>"
+                            class="btn btn-info">View Details</a></td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+        <div class="ajax-load text-center" id='loading-icon' style="display: none;">
+            <p><img src="/assets/imgs/loading_icon.gif" height="100">Loading articles...</p>
+        </div>
+    </div>
+
+</body>
+
+<script type="text/javascript">
+    $(window).scroll(function (e) {
+        if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
+            e.preventDefault();
+            $.ajax({
+                type: "GET",
+                url: `/notification_stats`,
+                beforeSend: function () {
+                    $('#loading-icon').show();
+                },
+                complete: function () {
+                    $('#loading-icon').hide();
+                },
+                success: function (obj) {
+                    if(obj){
+                        $('tbody').append(obj);
+                    }
+                    else{
+                        $('.ajax-load').html("<div class='alert alert-danger'><b>No more articles found</b></div>");
+                        /* setTimeout(()=>{
+                            var body = $("html, body");
+                        body.stop().animate({scrollTop:0}, 500, 'swing', function() { 
+                            alert('No more notification report below!!')
+                        });
+                        },1000); */
+                    }
+                },
+                error: function (obj) {
+                    alert('Server Not Responding..................')
+                    console.log("error", obj);
+                },
+            });
+        }
+    });
+</script>
+
+</html>

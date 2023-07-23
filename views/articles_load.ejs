@@ -1,0 +1,59 @@
+<% articles.forEach(function(check){ %>
+<tr>
+    <td><img src="<%= check.article_image %>" height="100px" width="100px"></td>
+    <td class="art"><%= check.article_category %></td>
+    <td class="art" style="width: 40%;">
+        <p class="text-center bold"><b><%=  check.article_heading %></b></p><%= check.article_summary %>
+    </td>
+    <td class="art"><%= check.article_author %></td>
+    <td class="art "><%= check.updated_at %></td>
+    <% if(check.notification_text){ %>
+    <td class="art notification-text"><%= check.notification_text %></td>
+    <% } 
+        else{ %>
+    <td>N.A.</td>
+    <% } %>
+    <td class="art">
+        <input type="checkbox" class="notification_sequence form-control" value="<%=check.id%>"
+            name="notification_sequence">
+        <br>
+        <select class="notif_sequence form-control">
+            <option value="0">Choose</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+        </select>
+    </td>
+    <td class="art">
+        <input type="hidden" value="<%=check.id%>" name="article_status_id">
+
+        <select class="article_status form-control" name="article_status">
+            <option value="Published" <% if(check.article_status=='Published'){ %> selected <% } %>>Published</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Needs Review">Needs Review</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Rollback">Rollback</option>
+            <option value="Weekend">Weekend</option>
+            <option value="Edited">Edited</option>
+            <option value="Republished" <% if(check.article_status=='Republished') { %> selected <% } else { %> <% } %>>
+                Republished</option>
+        </select>
+    </td>
+    <td class="art">
+        <a class="article_delete"><span class="btn btn-danger"><i class="fa fa-trash" title="Delete Sales"></i></span>
+            <input type="hidden" value="<%=check.id%>">
+        </a>
+        <a href="https://dashboard.volvmedia.com/edit_articles/<%=check.id%>"><button type="button"
+                class="btn btn-info"><i class="fa fa-edit"></i></button></a>
+        <a href="https://dashboard.volvmedia.com/view_articles/<%=check.id%>"><button type="button"
+                class="btn btn-success"><i class="fa fa-eye"></i></button></a>
+    </td>
+    <input type="hidden" class="status" value="<%=[check.notification_sent_status]%>">
+    <% if(check.notification_text){ %>
+    <td><a href=""><button class="btn btn-info pqr" value="<%= [check.id] %>" name="notify_btn">Notify</button></a></td>
+    <% } 
+else{ %>
+    <td>N.A.</td>
+    <% } %>
+</tr>
+<% }); %>

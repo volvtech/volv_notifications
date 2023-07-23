@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Report Stats</title>
+    <link rel="icon" type="image/png" href="https://avatars3.githubusercontent.com/u/56148781?s=400&u=e43e9af6b3cde53c0aad1720ba7054e54924f3fe&v=4">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.11.0/sweetalert2.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script defer src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.11.0/sweetalert2.all.min.js"></script>
+</head>
+<style>
+    .main_section {
+        font-family: 'Roboto', sans-serif !important;
+        font-size: 14px;
+    }
+    .table{
+        margin-top: 10px;
+        text-align: center;
+    }
+
+</style>
+
+<body>
+    <%- include('layouts/header') %>
+    <div class="container-fluid main_section"><br>
+     <div class="row">
+        <h3><i class="fa fa-info-circle"></i><u>Notification Statistics:</u></h3>
+        <a class="btn btn-primary" style="position: absolute; right: 0;" href="/">View Articles</a>
+        <a class="btn btn-primary" style="position: absolute; right: 120px;" href="/notification_report/">Notication Report</a>
+     </div>
+        <table class="table table-bordered table-striped table-hover">
+            <thead>
+                <th>Sr No.</th>
+                <th>Email</th>
+                <th>Reponse</th>
+            </thead>
+            <tbody>
+                <% notification_stats.forEach(function(element,i){ %>
+                <tr>
+                    <td><%= i+1 %></td>
+                    <td><%= element['name'] %></td>
+                    <td><%= element['notification_response'] %></td>
+                </tr>
+                <% }); %>
+            </tbody>
+            <input  id='article_id' type="hidden" value="<%= article_id %>">
+            <input  id='_id' type="hidden" value="<%= _id %>">
+
+            <input  id='user_count' type="hidden" value="30">
+        </table>
+    </div>
+    <div class="ajax-load text-center" id='loading-icon' style="display: none;">
+        <p><img src="/assets/imgs/loading_icon.gif" height="100">Loading articles...</p>
+    </div>
+</body>
+<script type="text/javascript">
+    $(window).scroll(function (e) {
+        if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
+
+            user_count = $('#user_count').val();
+            article_id=$('#article_id').val();
+            _id=$('#_id').val();
+            //console.log(user_count,article_id);
+            e.preventDefault();
+            $.ajax({
+                type: "GET",
+                url: `/user_stats`,
+                data: {
+                    user_count,article_id,_id
+                },
+                beforeSend: function () {
+                    $('#loading-icon').show();
+                    var temp=parseInt(user_count)+30
+                    $('#user_count').val(`${temp}`);
+                },
+                complete: function () {
+                    $('#loading-icon').hide();
+
+                },
+                success: function (obj) {
+                    if(obj){
+                        console.log("see",obj)
+                        $('tbody').append(obj);
+                    }
+                    else{
+                        $('.ajax-load').html("<div class='alert alert-danger'><b>No more articles found</b></div>");
+                    }
+                },
+                error: function (obj) {
+                    alert('Server Not Responding..................')
+                    console.log("error", obj);
+                },
+            });
+        }
+    });
+</script>
+
+</html>

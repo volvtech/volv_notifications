@@ -1,0 +1,14 @@
+<% notification_stats.forEach(function(element,i){ %>
+    <tr>
+        <td><%= stats_count+=1 %></td>
+        <td><img src="<%= element['article_image'] %>" height="100px" width="100px" alt="Image Not Loaded...!!!"></td>
+        <td><%= element['article_title'] %></td>
+        <td><%= element['success_count'] %></td>
+        <td><%= element['failure_count'] %></td>
+        <td><%= element['invalid_registration'] %></td>
+        <td><%= element['not_registered'] %></td>
+        <td><%= element['notification_date'] %></td>
+        <td><a href="/notification_report/stats/<%=element['article_id']%>/<%=element['_id']%>" class="btn btn-info">View
+                Details</a></td>
+    </tr>
+<% }); %>
