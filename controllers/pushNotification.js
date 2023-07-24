@@ -248,7 +248,7 @@ try {
             {
               "name":"uid",
               "operator": "contains",
-              "value": [55155, 33, 58933]
+              "value": [55155, 33, 58933, 61302]
             }
           ]
         }
@@ -284,6 +284,8 @@ try {
         body: body
       };
 
+      console.log("#controllers #pushNotification #pushNotification Test Dashboard Request options:", options)
+
       request(options, (error, response, body)=>{
         if (!error && response?.statusCode == 200) {
           console.log("#controllers #clevertapController #createCampaign TEST Dashboard API call success response:", response?.body, "Status code:", response?.statusCode)
@@ -307,6 +309,8 @@ try {
         body: body
       };
 
+      console.log("#controllers #pushNotification #pushNotification Live Dashboard Request options:", options)
+
       request(options, (error, response, body)=>{
         if (!error && response?.statusCode == 200) {
           console.log("#controllers #clevertapController #createCampaign LIVE Dashboard API call success response:", response?.body, "Status code:", response?.statusCode)
@@ -323,127 +327,127 @@ try {
       });        
 
       // Legacy Users
-      console.log("Legacy Users**")
-      var notificationArticleData;
-      var fcmTokens = [];
-      var usersEmail = [];
-      var usersID = [];
-      var NotificationResponseReport = [];
-      //Query to get the articles data from database for a particular id
-      let notificationArticleQuery1 = `SELECT * FROM articles where id = ${firstArticleId}`;
+      // console.log("Legacy Users**")
+      // var notificationArticleData;
+      // var fcmTokens = [];
+      // var usersEmail = [];
+      // var usersID = [];
+      // var NotificationResponseReport = [];
+      // //Query to get the articles data from database for a particular id
+      // let notificationArticleQuery1 = `SELECT * FROM articles where id = ${firstArticleId}`;
 
-      pool
-        .execute(notificationArticleQuery1, `${process.env.MYSQL_DATABASE1}`)
-        .then(([error, results, fields]) => {
-          notificationArticleData = results;
-          return notificationArticleData;
-        })
-        .then(async (notificationArticleData) => {
-          if (notificationArticleData[0]["breaking_news"] == "1") {
-            //Query to get all unique fcm_tokens and email asscociated with that token from database
-            usersInformationQuery = `SELECT users.id,tokens.fcm_token,users.email
-            FROM volv_users users
-            left join app_user_notification_preferences notification
-            on users.id=notification.uid
-            join app_user_fcm_tokens tokens
-            on users.id = tokens.uid
-            where (tokens.fcm_token is not null) and (notification.breaking_news="true" or notification.breaking_news is null);`;
-          } else {
-            //Query to get all unique fcm_tokens and email asscociated with that token from database
-            articleCategory = notificationArticleData[0]["article_category"];
-            articleCategory = articleCategory.split(",").join("|");
-            // console.log(articleCategory);
-            usersInformationQuery = `SELECT users.id,tokens.fcm_token,users.email
-                          FROM volv_users.volv_users users
-                          left join app_user_notification_preferences notifications
-                          on users.id=notifications.uid
-                          join app_user_categories categories
-                          on users.id=categories.uid
-                          join app_user_fcm_tokens tokens
-                          on users.id = tokens.uid 
-                          where (tokens.fcm_token is not null) 
-                          and 
-                          (notifications.trending_headlines="true" or notifications.trending_headlines is null)
-                          and 
-                          (categories.categories is null or categories.categories REGEXP '${articleCategory}')`;
-          }
-          [err, results, fields] = await pool.execute(
-            usersInformationQuery,
-            `${process.env.MYSQL_DATABASE2}`
-          );
-          return results;
-        })
-        .then((usersDetail) => {
-          let messages = [];
-          let unqiueTokens = new Set();
-          let increment = -1;
-          let unqiueTokensLength = 0;
-          let limit = 450;
+      // pool
+      //   .execute(notificationArticleQuery1, `${process.env.MYSQL_DATABASE1}`)
+      //   .then(([error, results, fields]) => {
+      //     notificationArticleData = results;
+      //     return notificationArticleData;
+      //   })
+      //   .then(async (notificationArticleData) => {
+      //     if (notificationArticleData[0]["breaking_news"] == "1") {
+      //       //Query to get all unique fcm_tokens and email asscociated with that token from database
+      //       usersInformationQuery = `SELECT users.id,tokens.fcm_token,users.email
+      //       FROM volv_users users
+      //       left join app_user_notification_preferences notification
+      //       on users.id=notification.uid
+      //       join app_user_fcm_tokens tokens
+      //       on users.id = tokens.uid
+      //       where (tokens.fcm_token is not null) and (notification.breaking_news="true" or notification.breaking_news is null);`;
+      //     } else {
+      //       //Query to get all unique fcm_tokens and email asscociated with that token from database
+      //       articleCategory = notificationArticleData[0]["article_category"];
+      //       articleCategory = articleCategory.split(",").join("|");
+      //       // console.log(articleCategory);
+      //       usersInformationQuery = `SELECT users.id,tokens.fcm_token,users.email
+      //                     FROM volv_users.volv_users users
+      //                     left join app_user_notification_preferences notifications
+      //                     on users.id=notifications.uid
+      //                     join app_user_categories categories
+      //                     on users.id=categories.uid
+      //                     join app_user_fcm_tokens tokens
+      //                     on users.id = tokens.uid 
+      //                     where (tokens.fcm_token is not null) 
+      //                     and 
+      //                     (notifications.trending_headlines="true" or notifications.trending_headlines is null)
+      //                     and 
+      //                     (categories.categories is null or categories.categories REGEXP '${articleCategory}')`;
+      //     }
+      //     [err, results, fields] = await pool.execute(
+      //       usersInformationQuery,
+      //       `${process.env.MYSQL_DATABASE2}`
+      //     );
+      //     return results;
+      //   })
+      //   .then((usersDetail) => {
+      //     let messages = [];
+      //     let unqiueTokens = new Set();
+      //     let increment = -1;
+      //     let unqiueTokensLength = 0;
+      //     let limit = 450;
 
-          for (let i = 0; i < usersDetail.length; i++) {
-            if (
-              usersDetail[i]["fcm_token"] != "" &&
-              !unqiueTokens.has(usersDetail[i]["fcm_token"])
-            ) {
-              unqiueTokens.add(usersDetail[i]["fcm_token"]);
-              if (unqiueTokensLength % limit === 0) {
-                usersID.push([usersDetail[i]["id"]]);
-                fcmTokens.push([usersDetail[i]["fcm_token"]]);
-                usersEmail.push([usersDetail[i]["email"]]);
-                increment += 1;
-              } else {
-                usersID[increment].push(usersDetail[i]["id"]);
-                fcmTokens[increment].push(usersDetail[i]["fcm_token"]);
-                usersEmail[increment].push(usersDetail[i]["email"]);
-              }
-              unqiueTokensLength += 1;
-            }
-          }
-          let start = 0;
-          let end = Math.ceil(unqiueTokensLength / limit);
-          articlePreference = articlePreference.toString();
-          while (start < end) {
-            messages.push({
-              tokens: fcmTokens[start],
-              content_available: true,
-              mutable_content: true,
-              notification: {
-                body: notificationArticleData[0]["notification_text"],
-              },
-              android: {
-                priority: "normal",
-                ttl: 2224500,
-              },
-              apns: {
-                headers: {
-                  "apns-priority": "5",
-                  "apns-expiration": "1604750400",
-                },
-                payload: {
-                  aps: {
-                    "content-available": 1,
-                  },
-                },
-              },
-              data: {
-                article_id: `(${articlePreference})`,
-                click_action: "FLUTTER_NOTIFICATION_CLICK",
-                android_channel_id: "volvmedia_volvapp",
-              },
-            });
-            start += 1;
-          }
-          return messages;
-        })
-        .then((messages) => {
-          // let request = messages.map((message) =>
-          //   admin.messaging().sendMulticast(message)
-          // );
-          // Promise.allSettled(request).then((results) => {
-            // console.log("#Controllers #pusNotification Notification sent successfully to legacy users", messages)
-            //   res.send(JSON.stringify("Notification sent successfully!"));
-          // });
-        });
+      //     for (let i = 0; i < usersDetail.length; i++) {
+      //       if (
+      //         usersDetail[i]["fcm_token"] != "" &&
+      //         !unqiueTokens.has(usersDetail[i]["fcm_token"])
+      //       ) {
+      //         unqiueTokens.add(usersDetail[i]["fcm_token"]);
+      //         if (unqiueTokensLength % limit === 0) {
+      //           usersID.push([usersDetail[i]["id"]]);
+      //           fcmTokens.push([usersDetail[i]["fcm_token"]]);
+      //           usersEmail.push([usersDetail[i]["email"]]);
+      //           increment += 1;
+      //         } else {
+      //           usersID[increment].push(usersDetail[i]["id"]);
+      //           fcmTokens[increment].push(usersDetail[i]["fcm_token"]);
+      //           usersEmail[increment].push(usersDetail[i]["email"]);
+      //         }
+      //         unqiueTokensLength += 1;
+      //       }
+      //     }
+      //     let start = 0;
+      //     let end = Math.ceil(unqiueTokensLength / limit);
+      //     articlePreference = articlePreference.toString();
+      //     while (start < end) {
+      //       messages.push({
+      //         tokens: fcmTokens[start],
+      //         content_available: true,
+      //         mutable_content: true,
+      //         notification: {
+      //           body: notificationArticleData[0]["notification_text"],
+      //         },
+      //         android: {
+      //           priority: "normal",
+      //           ttl: 2224500,
+      //         },
+      //         apns: {
+      //           headers: {
+      //             "apns-priority": "5",
+      //             "apns-expiration": "1604750400",
+      //           },
+      //           payload: {
+      //             aps: {
+      //               "content-available": 1,
+      //             },
+      //           },
+      //         },
+      //         data: {
+      //           article_id: `(${articlePreference})`,
+      //           click_action: "FLUTTER_NOTIFICATION_CLICK",
+      //           android_channel_id: "volvmedia_volvapp",
+      //         },
+      //       });
+      //       start += 1;
+      //     }
+      //     return messages;
+      //   })
+      //   .then((messages) => {
+      //     // let request = messages.map((message) =>
+      //     //   admin.messaging().sendMulticast(message)
+      //     // );
+      //     // Promise.allSettled(request).then((results) => {
+      //       // console.log("#Controllers #pusNotification Notification sent successfully to legacy users", messages)
+      //       //   res.send(JSON.stringify("Notification sent successfully!"));
+      //     // });
+      //   });
 
 
   })
