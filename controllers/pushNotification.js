@@ -247,7 +247,7 @@ try {
           "profile_fields": [
             {
               "name":"uid",
-              "operator": "contains",
+              "operator": "equals",
               "value": [55155, 33, 58933, 61302]
             }
           ]
