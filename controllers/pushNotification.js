@@ -248,7 +248,8 @@ try {
             {
               "name":"uid",
               "operator": "equals",
-              "value": 61302
+              // "value": [55155, 33, 58933, 61302]
+              "value": 2 
             }
           ]
         }
