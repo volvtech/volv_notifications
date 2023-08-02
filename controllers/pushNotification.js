@@ -248,7 +248,7 @@ async function pushNotification(req, res) {
             {
               "name":"uid",
               "operator": "equals",
-              "value": 60137
+              "value": 33
             }
           ]
         }
